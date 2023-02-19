@@ -105,14 +105,33 @@ class CorpusReader_TFIDF():
         """
         Return the cosine similarity between two documents in the corpus
         """
-        pass
+        return self.cosine_sim_new(list(self._corpus.words(fileid1)), fileid2)
 
     def cosine_sim_new(self, words, fileid):
         """
-        return the cosine similary between a “new” document (as if 
+        return the cosine similarity between a “new” document (as if
         specified like the tfidf_new() method) and the documents specified by fileid. 
         """
-        pass
+
+        all_words = set(words + list(self._corpus.words(fileid)))
+        if self.toStem:
+            stemmer = SnowballStemmer("english")
+            all_words = [stemmer.stem(word) for word in all_words]
+        if self.ignoreCase:
+            all_words = [word.lower() for word in all_words]
+        if len(self.stopwords):
+            all_words = [word for word in all_words if word not in self.stopwords]
+
+        numerator = 0
+        doc1_tf = self.get_tf(words)
+        doc2_tf = self.get_tf(self._corpus.words(fileid))
+        # A * B
+        for word in all_words:
+            numerator = numerator + (doc1_tf[word] * doc2_tf[word])
+        # ||A|| * ||B|| - Not sure why we need the L2 norm for word frequencies, but who am I to question the algorithm
+        # Also substituting the formal definition sqrt(X**2) for abs(X) since they do the same thing
+        denominator = abs(sum(doc1_tf.values())) * abs(sum(doc2_tf.values()))
+        return numerator / denominator
 
     # Bonus Method
     def query(self, words):
@@ -128,6 +147,7 @@ class CorpusReader_TFIDF():
         Return a list of file identifiers for the files that make up this corpus.
         """
         return self._corpus.fileids()
+
     def raw(self, fileids=None):
         """
         Returns the concatenation of the raw text of the specified files, if specified
@@ -137,5 +157,7 @@ class CorpusReader_TFIDF():
     def words(self, fileids=None):
         """
         Returns the words in the specified file(s).
+        :return: Instance of class nltk.corpus.reader.util.StreamBackedCorpusView
         """
+        # Cast to list?
         return self._corpus.words(fileids)
