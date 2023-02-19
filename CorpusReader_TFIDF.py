@@ -114,6 +114,14 @@ class CorpusReader_TFIDF():
         """
         pass
 
+    # Bonus Method
+    def query(self, words):
+        """
+        :param words: A list of words constituting a new/simulated document
+        :return: A list of (document, cosine_sim) tuples comparing each document against words
+        """
+        pass
+
     #  Shared Methods
     def fileids(self):
         """
