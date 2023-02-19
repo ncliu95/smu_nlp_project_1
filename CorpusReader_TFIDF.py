@@ -14,6 +14,7 @@ class CorpusReader_TFIDF():
         self.ignoreCase = ignoreCase
 
         if stopWord == "standard":
+            nltk.download('stopwords')
             self.stopwords = set(stopwords.words('english'))
         elif stopWord != "none":
             with open(stopWord, 'r') as f:
