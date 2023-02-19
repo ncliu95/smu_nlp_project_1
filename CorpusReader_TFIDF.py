@@ -12,7 +12,7 @@ class CorpusReader_TFIDF():
         self.stopwords = set()
         self.toStem = toStem
         self.ignoreCase = ignoreCase
-        
+
         if stopWord == "standard":
             self.stopwords = set(stopwords.words('english'))
         elif stopWord != "none":
@@ -84,7 +84,7 @@ class CorpusReader_TFIDF():
         dictionary. The key is the fileid of each document, for each document the value is the tfidf of that 
         document (using the same format as above). 
         """
-        pass 
+        pass
 
     def tfidfNew(self, words):
         """
@@ -92,7 +92,7 @@ class CorpusReader_TFIDF():
         honor the various parameters (ignoreCase, toStem etc.) when preprocessing the new document. 
         Also, the idf of each word should not be changed (i.e. the “new” document should not be treated as 
         part of the corpus). 
-        """ 
+        """
         pass
 
     def idf(self):
@@ -119,15 +119,15 @@ class CorpusReader_TFIDF():
         """
         Return a list of file identifiers for the files that make up this corpus.
         """
-        pass   
+        return self._corpus.fileids()
     def raw(self, fileids=None):
         """
         Returns the concatenation of the raw text of the specified files, if specified
         """
-        pass
+        return self._corpus.raw(fileids)
 
     def words(self, fileids=None):
         """
         Returns the words in the specified file(s).
         """
-        pass
+        return self._corpus.words(fileids)
