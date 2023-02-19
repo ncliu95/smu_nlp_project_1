@@ -63,7 +63,7 @@ class CorpusReader_TFIDF():
     #  Returns array of tfidf, one for each doc
     def get_tfidf_all_docs(self):
         tfidf_all_docs = []
-        for doc in self.corpus:
+        for doc in self._corpus:
             tfidf = self.get_tfidf(doc)
             tfidf_all_docs.append(tfidf)
         return tfidf_all_docs
