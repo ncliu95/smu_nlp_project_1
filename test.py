@@ -33,6 +33,8 @@ print(myCorpus.words())
 
 print(myCorpus.words(["2021-Biden.txt"]))
 
+print(myCorpus.query(["Representatives", "Senate"]))
+
 
 #  This is for testing your own corpus
 #

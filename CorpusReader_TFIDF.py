@@ -100,7 +100,7 @@ class CorpusReader_TFIDF():
         """
         Return the idf of each term as a dictionary : keys are the terms, and values are the idf
         """
-        pass
+        return self.get_idf()
 
     def cosine_sim(self, fileid1, fileid2) -> float:
         """
@@ -114,6 +114,7 @@ class CorpusReader_TFIDF():
         specified like the tfidf_new() method) and the documents specified by fileid. 
         """
 
+        # Preprocessing
         all_words = set(words + list(self._corpus.words(fileid)))
         if self.toStem:
             stemmer = SnowballStemmer("english")
@@ -135,12 +136,15 @@ class CorpusReader_TFIDF():
         return numerator / denominator
 
     # Bonus Method
-    def query(self, words):
+    def query(self, words) -> list[tuple[str, float]]:
         """
         :param words: A list of words constituting a new/simulated document
         :return: A list of (document, cosine_sim) tuples comparing each document against words
         """
-        pass
+        query_results = []
+        for doc in self.fileids():
+            query_results.append((doc, self.cosine_sim_new(words, doc)))
+        return query_results
 
     #  Shared Methods
     def fileids(self):
@@ -155,7 +159,7 @@ class CorpusReader_TFIDF():
         """
         return self._corpus.raw(fileids)
 
-    def words(self, fileids=None) -> nltk.corpus.reader.util.StreamBackedCorpusView:
+    def words(self, fileids=None):
         """
         Returns the words in the specified file(s).
         :return: Instance of class nltk.corpus.reader.util.StreamBackedCorpusView
