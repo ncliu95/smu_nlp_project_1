@@ -102,13 +102,13 @@ class CorpusReader_TFIDF():
         """
         pass
 
-    def cosine_sim(self, fileid1, fileid2):
+    def cosine_sim(self, fileid1, fileid2) -> float:
         """
         Return the cosine similarity between two documents in the corpus
         """
         return self.cosine_sim_new(list(self._corpus.words(fileid1)), fileid2)
 
-    def cosine_sim_new(self, words, fileid):
+    def cosine_sim_new(self, words, fileid) -> float:
         """
         return the cosine similarity between a “new” document (as if
         specified like the tfidf_new() method) and the documents specified by fileid. 
@@ -155,7 +155,7 @@ class CorpusReader_TFIDF():
         """
         return self._corpus.raw(fileids)
 
-    def words(self, fileids=None):
+    def words(self, fileids=None) -> nltk.corpus.reader.util.StreamBackedCorpusView:
         """
         Returns the words in the specified file(s).
         :return: Instance of class nltk.corpus.reader.util.StreamBackedCorpusView
