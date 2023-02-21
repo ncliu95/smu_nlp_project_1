@@ -54,18 +54,24 @@ class CorpusReader_TFIDF():
         elif self._idf == "smooth":
             return {word: math.log(1 + len(self._corpus) / (1 + doc_freq[word])) for word in doc_freq}
 
-    #  Returns dictionary of tfidf for each word in doc
-    def get_tfidf(self, doc) -> dict:
+    #  Returns dictionary of tfidf for each word in doc    
+    def get_tfidf(self, doc, return_zero=False):
         tf = self.get_tf(doc)
-        idf = self.get_idf()
-        tfidf = {word: tf[word] * idf[word] for word in tf.keys() & idf.keys()}
+        tfidf = {}
+        for term, freq in tf.items():
+            idf = self.get_idf(term)
+            tfidf[term] = freq * idf
+        if return_zero:
+            for term in self.terms():
+                if term not in tfidf:
+                    tfidf[term] = 0
         return tfidf
 
     #  Returns array of tfidf, one for each doc
-    def get_tfidf_all_docs(self):
+    def get_tfidf_all_docs(self, returnZero=False):
         tfidf_all_docs = []
         for doc in self._corpus:
-            tfidf = self.get_tfidf(doc)
+            tfidf = self.get_tfidf(doc, return_zero=returnZero)
             tfidf_all_docs.append(tfidf)
         return tfidf_all_docs
 
@@ -77,7 +83,8 @@ class CorpusReader_TFIDF():
         values are the tf-idf value of the dimension. If returnZero is true, then the dictionary will contains 
         terms that have 0 value for that vector, otherwise the vector will omit those terms
         """
-        pass
+        doc = self._corpus.raw(fileid)
+        return self.get_tfidf(doc, return_zero=returnZero)
 
     def tfidfAll(self, returnZero=False):
         """
@@ -85,7 +92,7 @@ class CorpusReader_TFIDF():
         dictionary. The key is the fileid of each document, for each document the value is the tfidf of that 
         document (using the same format as above). 
         """
-        pass
+        return self.get_tfidf_all_docs(returnZero)
 
     def tfidfNew(self, words):
         """
