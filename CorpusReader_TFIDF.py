@@ -37,32 +37,32 @@ class CorpusReader_TFIDF():
         elif self._tf == "log":
             return {word: 1 + math.log(tf[word]) if tf[word] > 0 else 0 for word in tf}
 
-    #  Returns dictionary of idf for each word in doc
+    #  Returns dictionary of idf for each word in each doc
     def get_idf(self) -> dict:
         doc_freq = defaultdict(int)
-        for doc in self._corpus:
+        for doc in self._corpus.fileids():
             if self.toStem:
                 stemmer = SnowballStemmer("english")
-                doc = [stemmer.stem(word) for word in doc]
-            for word in set(doc):
+                doc = [stemmer.stem(word) for word in self._corpus.words(doc)]
+            for word in set(self._corpus.words(doc)):
                 if self.ignoreCase:
                     word = word.lower()
                 if word not in self.stopwords:
                     doc_freq[word] += 1
         if self._idf == "base":
-            return {word: math.log(len(self._corpus) / doc_freq[word]) for word in doc_freq}
+            return {word: math.log(len(self._corpus.fileids()) / doc_freq[word]) for word in doc_freq}
         elif self._idf == "smooth":
-            return {word: math.log(1 + len(self._corpus) / (1 + doc_freq[word])) for word in doc_freq}
+            return {word: math.log(1 + len(self._corpus.fileids()) / (1 + doc_freq[word])) for word in doc_freq}
 
     #  Returns dictionary of tfidf for each word in doc    
     def get_tfidf(self, doc, return_zero=False):
         tf = self.get_tf(doc)
         tfidf = {}
+        idf = self.get_idf()
         for term, freq in tf.items():
-            idf = self.get_idf(term)
-            tfidf[term] = freq * idf
+            tfidf[term] = freq * idf[term]
         if return_zero:
-            for term in self.terms():
+            for term in doc:
                 if term not in tfidf:
                     tfidf[term] = 0
         return tfidf
@@ -70,8 +70,8 @@ class CorpusReader_TFIDF():
     #  Returns array of tfidf, one for each doc
     def get_tfidf_all_docs(self, returnZero=False):
         tfidf_all_docs = []
-        for doc in self._corpus:
-            tfidf = self.get_tfidf(doc, return_zero=returnZero)
+        for doc in set(self._corpus.fileids()):
+            tfidf = self.get_tfidf(list(self._corpus.words(doc)), return_zero=returnZero)
             tfidf_all_docs.append(tfidf)
         return tfidf_all_docs
 
@@ -83,7 +83,7 @@ class CorpusReader_TFIDF():
         values are the tf-idf value of the dimension. If returnZero is true, then the dictionary will contains 
         terms that have 0 value for that vector, otherwise the vector will omit those terms
         """
-        doc = self._corpus.raw(fileid)
+        doc = list(self._corpus.words(fileid))
         return self.get_tfidf(doc, return_zero=returnZero)
 
     def tfidfAll(self, returnZero=False):
