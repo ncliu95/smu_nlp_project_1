@@ -102,7 +102,7 @@ class CorpusReader_TFIDF():
         Also, the idf of each word should not be changed (i.e. the “new” document should not be treated as 
         part of the corpus). 
         """
-        pass
+        return self.get_tfidf(words, return_zero=False)
 
     def idf(self):
         """
