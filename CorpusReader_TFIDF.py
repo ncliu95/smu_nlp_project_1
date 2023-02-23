@@ -147,11 +147,13 @@ class CorpusReader_TFIDF():
     def query(self, words) -> list[tuple[str, float]]:
         """
         :param words: A list of words constituting a new/simulated document
-        :return: A list of (document, cosine_sim) tuples comparing each document against words
+        :return: A list of (document, cosine_sim) tuples comparing each document against words, sorted descending
+        against cosine_sim
         """
         query_results = []
         for doc in self.fileids():
             query_results.append((doc, self.cosine_sim_new(words, doc)))
+        query_results.sort(key=lambda tup: tup[1], reverse=True)
         return query_results
 
     #  Shared Methods
