@@ -5,7 +5,7 @@ from nltk.stem.snowball import SnowballStemmer
 from collections import defaultdict
 
 
-class CorpusReader_TFIDF():
+class CorpusReader_TFIDF:
     def __init__(self, corpus, tf="raw", idf="base", stopWord="none", toStem=False, ignoreCase=True):
         self._corpus = corpus
         self._tf = tf
@@ -81,7 +81,7 @@ class CorpusReader_TFIDF():
         """
         Return the TF-IDF for the specific document in the corpus (specified 
         by fileid). The vector is represented by a dictionary/hash in python. The keys are the terms, and the 
-        values are the tf-idf value of the dimension. If returnZero is true, then the dictionary will contains 
+        values are the tf-idf value of the dimension. If returnZero is true, then the dictionary will contain
         terms that have 0 value for that vector, otherwise the vector will omit those terms
         """
         doc = list(self._corpus.words(fileid))
