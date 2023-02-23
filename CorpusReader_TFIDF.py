@@ -4,6 +4,7 @@ from nltk.corpus import stopwords
 from nltk.stem.snowball import SnowballStemmer
 from collections import defaultdict
 
+
 class CorpusReader_TFIDF():
     def __init__(self, corpus, tf="raw", idf="base", stopWord="none", toStem=False, ignoreCase=True):
         self._corpus = corpus
@@ -57,8 +58,8 @@ class CorpusReader_TFIDF():
     #  Returns dictionary of tfidf for each word in doc    
     def get_tfidf(self, doc, return_zero=False):
         tf = self.get_tf(doc)
-        tfidf = {}
         idf = self.get_idf()
+        tfidf = {}
         for term, freq in tf.items():
             tfidf[term] = freq * idf[term]
         if return_zero:
@@ -69,10 +70,10 @@ class CorpusReader_TFIDF():
 
     #  Returns array of tfidf, one for each doc
     def get_tfidf_all_docs(self, returnZero=False):
-        tfidf_all_docs = []
+        tfidf_all_docs = defaultdict(dict)
         for doc in set(self._corpus.fileids()):
             tfidf = self.get_tfidf(list(self._corpus.words(doc)), return_zero=returnZero)
-            tfidf_all_docs.append(tfidf)
+            tfidf_all_docs[doc] = tfidf
         return tfidf_all_docs
 
     #  Specific Methods

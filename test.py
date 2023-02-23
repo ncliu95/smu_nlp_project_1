@@ -1,6 +1,5 @@
 from nltk.corpus import inaugural, PlaintextCorpusReader
 from CorpusReader_TFIDF import *
-#from nltk.corpus.
 
 nltk.download('inaugural')
 nltk.download('punkt')
@@ -11,15 +10,14 @@ print(len(inaugural.sents()))
 print(inaugural.fileids())
 print(inaugural.sents(['1789-washington.txt']))
 
-
 myCorpus = CorpusReader_TFIDF(inaugural)
 print(myCorpus.tfidf(['1789-Washington.txt']))
 
 print("-----\n")
 
-#q = myCorpus.tfidfAll()
-#for x in q:
-#   print(x, q[x])
+q = myCorpus.tfidfAll()
+for x in q:
+    print(x, q[x])
 
 print("-----\n")
 
@@ -34,7 +32,6 @@ print(myCorpus.words())
 print(myCorpus.words(["2021-Biden.txt"]))
 
 print(myCorpus.query(["Representatives", "Senate"]))
-
 
 #  This is for testing your own corpus
 #
