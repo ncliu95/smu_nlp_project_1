@@ -1,4 +1,4 @@
-from nltk.corpus import inaugural, PlaintextCorpusReader
+from nltk.corpus import inaugural
 from CorpusReader_TFIDF import *
 
 nltk.download('inaugural')

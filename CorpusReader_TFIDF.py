@@ -22,7 +22,6 @@ class CorpusReader_TFIDF:
                 for line in f:
                     self.stopwords.add(line.strip())
 
-    #  Returns dictionary of tf for each word in doc
     def get_tf(self, doc) -> dict:
         tf = defaultdict(int)
         if self.toStem:
@@ -41,6 +40,7 @@ class CorpusReader_TFIDF:
     #  Returns dictionary of idf for each word in each doc
     def get_idf(self) -> dict:
         doc_freq = defaultdict(int)
+        # Preprocessing
         for doc in self._corpus.fileids():
             if self.toStem:
                 stemmer = SnowballStemmer("english")
@@ -50,13 +50,14 @@ class CorpusReader_TFIDF:
                     word = word.lower()
                 if word not in self.stopwords:
                     doc_freq[word] += 1
+
         if self._idf == "base":
             return {word: math.log(len(self._corpus.fileids()) / doc_freq[word]) for word in doc_freq}
         elif self._idf == "smooth":
             return {word: math.log(1 + len(self._corpus.fileids()) / (1 + doc_freq[word])) for word in doc_freq}
 
     #  Returns dictionary of tfidf for each word in doc    
-    def get_tfidf(self, doc, return_zero=False):
+    def get_tfidf(self, doc, return_zero=False) -> dict:
         tf = self.get_tf(doc)
         idf = self.get_idf()
         tfidf = {}
@@ -68,8 +69,8 @@ class CorpusReader_TFIDF:
                     tfidf[term] = 0
         return tfidf
 
-    #  Returns array of tfidf, one for each doc
-    def get_tfidf_all_docs(self, returnZero=False):
+    #  Returns dictionary of tfidf dicts, one for each doc
+    def get_tfidf_all_docs(self, returnZero=False) -> dict[dict]:
         tfidf_all_docs = defaultdict(dict)
         for doc in set(self._corpus.fileids()):
             tfidf = self.get_tfidf(list(self._corpus.words(doc)), return_zero=returnZero)
@@ -77,48 +78,58 @@ class CorpusReader_TFIDF:
         return tfidf_all_docs
 
     #  Specific Methods
-    def tfidf(self, fileid, returnZero=False):
+    def tfidf(self, fileid, returnZero=False) -> dict:
         """
-        Return the TF-IDF for the specific document in the corpus (specified 
-        by fileid). The vector is represented by a dictionary/hash in python. The keys are the terms, and the 
-        values are the tf-idf value of the dimension. If returnZero is true, then the dictionary will contain
-        terms that have 0 value for that vector, otherwise the vector will omit those terms
+        Returns the TF-IDF for the specific document in the corpus (specified by fileid). The vector is represented
+        by a dictionary/hash in python. The keys are the terms, and the values are the tf-idf value of the dimension.
+        If returnZero is true, then the dictionary will contain terms that have 0 value for that vector,
+        otherwise the vector will omit those terms.
+        :param fileid: A file ID contained within the object's corpus
+        :param returnZero: Boolean to control omission of terms that have 0 value for the given vector
+        :return: A dictionary of TF-IDF values for each word in the document
         """
         doc = list(self._corpus.words(fileid))
         return self.get_tfidf(doc, return_zero=returnZero)
 
-    def tfidfAll(self, returnZero=False):
+    def tfidfAll(self, returnZero=False) -> dict[dict]:
         """
-        Return the TF-IDF for all documents in the corpus. It will be returned as a 
-        dictionary. The key is the fileid of each document, for each document the value is the tfidf of that 
-        document (using the same format as above). 
+        Returns the TF-IDF for all documents in the corpus as a dictionary. The key is the fileid of each document,
+        for each document the value is the tfidf of that.
+        document (using the same format as above).
+        :param returnZero: Boolean to control omission of terms that have 0 value for the given vector
+        :return: A dictionary of dictionaries of TF-IDF values, one for each document
         """
         return self.get_tfidf_all_docs(returnZero)
 
-    def tfidfNew(self, words):
+    def tfidfNew(self, words) -> dict:
         """
-        return the tf-idf of a “new” document, represented by a list of words. You should 
-        honor the various parameters (ignoreCase, toStem etc.) when preprocessing the new document. 
-        Also, the idf of each word should not be changed (i.e. the “new” document should not be treated as 
-        part of the corpus). 
+        Returns the tf-idf of a “new” document, represented by a list of words. Honors the various parameters
+        (ignoreCase, toStem etc.) of the object when preprocessing the new document.
+        Also, the idf of each word is static (i.e. the “new” document is not treated as part of the corpus).
+        :param words: A list of words constituting a new/simulated document
+        return: A dictionary of TF-IDF values for each word in the simulated document
         """
         return self.get_tfidf(words, return_zero=False)
 
-    def idf(self):
+    def idf(self) -> dict:
         """
-        Return the idf of each term as a dictionary : keys are the terms, and values are the idf
+        :return: The idf of each term as a dictionary : keys are the terms, and values are the idf
         """
         return self.get_idf()
 
     def cosine_sim(self, fileid1, fileid2) -> float:
         """
-        Return the cosine similarity between two documents in the corpus
+        :param fileid1: A file ID contained within the object's corpus
+        :param fileid2: A file ID contained within the object's corpus
+        :return: The cosine similarity between two documents in the corpus
         """
         return self.cosine_sim_new(list(self._corpus.words(fileid1)), fileid2)
 
     def cosine_sim_new(self, words, fileid) -> float:
         """
-        return the cosine similarity between a “new” document (as if
+        :param words: A list of words constituting a new/simulated document
+        :param fileid: A file ID contained within the object's corpus
+        :return: the cosine similarity between a “new” document (as if
         specified like the tfidf_new() method) and the documents specified by fileid. 
         """
 
@@ -138,8 +149,7 @@ class CorpusReader_TFIDF:
         # A * B
         for word in all_words:
             numerator = numerator + (doc1_tf[word] * doc2_tf[word])
-        # ||A|| * ||B|| - Not sure why we need the L2 norm for word frequencies, but who am I to question the algorithm
-        # Also substituting the formal definition sqrt(X**2) for abs(X) since they do the same thing
+        # Substituting the formal definition sqrt(X**2) for abs(X) since they do the same thing
         denominator = abs(sum(doc1_tf.values())) * abs(sum(doc2_tf.values()))
         return numerator / denominator
 
@@ -157,22 +167,22 @@ class CorpusReader_TFIDF:
         return query_results
 
     #  Shared Methods
-    def fileids(self):
+    def fileids(self) -> list:
         """
-        Return a list of file identifiers for the files that make up this corpus.
+        :return: A list of file identifiers for the files that make up this corpus.
         """
-        return self._corpus.fileids()
+        return list(self._corpus.fileids())
 
-    def raw(self, fileids=None):
+    def raw(self, fileids=None) -> list:
         """
-        Returns the concatenation of the raw text of the specified files, if specified
+        :param fileids: A list of file IDs contained within the object's corpus
+        :return: The concatenation of the raw text of the specified file(s)
         """
-        return self._corpus.raw(fileids)
+        return list(self._corpus.raw(fileids))
 
-    def words(self, fileids=None):
+    def words(self, fileids=None) -> list:
         """
-        Returns the words in the specified file(s).
-        :return: Instance of class nltk.corpus.reader.util.StreamBackedCorpusView
+        :param fileids: A list of file IDs contained within the object's corpus
+        :return: The list containing the words in the specified file(s).
         """
-        # Cast to list?
-        return self._corpus.words(fileids)
+        return list(self._corpus.words(fileids))
