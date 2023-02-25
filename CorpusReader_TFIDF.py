@@ -1,3 +1,11 @@
+"""****************************************************
+* CS 7322 - Program 1
+* Description: Implements CorpusReader_TFIDF as an
+* extension of NLTK for computing the TF-IDF & cosine
+* similarity values of NLTK Corpus objects
+* Authors: Nick Liu & Bryce Shurts (Team "Project 10")
+****************************************************"""
+
 import nltk
 import math
 from nltk.corpus import stopwords
